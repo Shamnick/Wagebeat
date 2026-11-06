@@ -36,7 +36,8 @@ enum PreviewRenderer {
             let expanded = AppModel(store: store, fixedDate: date)
             expanded.isExpanded = true
             render(
-                ExpandedView(model: expanded),
+                ExpandedView(model: expanded)
+                    .frame(width: Metrics.expandedSize.width, height: Metrics.expandedSize.height),
                 size: Metrics.expandedSize,
                 to: dir.appendingPathComponent("expanded-\(theme.rawValue).png")
             )
@@ -45,9 +46,41 @@ enum PreviewRenderer {
             settings.isExpanded = true
             settings.showSettings = true
             render(
-                ExpandedView(model: settings),
+                ExpandedView(model: settings)
+                    .frame(width: Metrics.expandedSize.width, height: Metrics.expandedSize.height),
                 size: Metrics.expandedSize,
                 to: dir.appendingPathComponent("settings-\(theme.rawValue).png")
+            )
+        }
+
+        renderExtremes(date: date, dir: dir)
+    }
+
+    /// 拉到手柄两端极限时的样子，用来确认排版不会挤坏。
+    private static func renderExtremes(date: Date, dir: URL) {
+        let store = SettingsStore(persisted: false)
+        store.settings.theme = .aurora
+        store.settings.pinned = true
+
+        let cases: [(String, Bool, CGSize)] = [
+            ("compact-min", false, CGSize(width: Metrics.minCompactWidth, height: Metrics.compactSize.height)),
+            ("compact-max", false, CGSize(width: Metrics.maxCompactWidth, height: Metrics.compactSize.height)),
+            ("expanded-min", true, CGSize(width: Metrics.minExpandedWidth, height: Metrics.minExpandedHeight)),
+            ("expanded-max", true, CGSize(width: Metrics.maxExpandedWidth, height: Metrics.maxExpandedHeight))
+        ]
+
+        for (name, expanded, size) in cases {
+            store.settings.compactWidth = Double(size.width)
+            store.settings.expandedWidth = Double(size.width)
+            store.settings.expandedHeight = Double(size.height)
+
+            let model = AppModel(store: store, fixedDate: date)
+            model.isExpanded = expanded
+            let view = expanded ? AnyView(ExpandedView(model: model)) : AnyView(CompactView(model: model))
+            render(
+                view.frame(width: size.width, height: size.height),
+                size: size,
+                to: dir.appendingPathComponent("\(name).png")
             )
         }
     }

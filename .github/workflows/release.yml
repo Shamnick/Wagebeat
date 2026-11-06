@@ -19,7 +19,11 @@ jobs:
         run: swift --version && xcodebuild -version
 
       - name: Build app bundle
-        run: ./Scripts/build-app.sh release
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            export VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          ./Scripts/build-app.sh release
 
       - name: Zip
         run: |

@@ -66,4 +66,42 @@ final class AppModel: ObservableObject {
     func bumpWage(_ delta: Double) {
         update { $0.dailyWage = max(0, $0.dailyWage + delta) }
     }
+
+    // MARK: - 卡片尺寸
+
+    var compactCardSize: CGSize {
+        CGSize(width: Metrics.clampCompactWidth(store.settings.compactWidth),
+               height: Metrics.compactSize.height)
+    }
+
+    var expandedCardSize: CGSize {
+        CGSize(width: Metrics.clampExpandedWidth(store.settings.expandedWidth),
+               height: Metrics.clampExpandedHeight(store.settings.expandedHeight))
+    }
+
+    func cardSize(expanded: Bool) -> CGSize {
+        expanded ? expandedCardSize : compactCardSize
+    }
+
+    var cardSize: CGSize { cardSize(expanded: isExpanded) }
+
+    /// 拖动右下角改尺寸：收起态只改宽度，展开态宽高都改。
+    func resizeCard(to size: CGSize) {
+        update { s in
+            if isExpanded {
+                s.expandedWidth = Double(Metrics.clampExpandedWidth(size.width))
+                s.expandedHeight = Double(Metrics.clampExpandedHeight(size.height))
+            } else {
+                s.compactWidth = Double(Metrics.clampCompactWidth(size.width))
+            }
+        }
+    }
+
+    func resetCardSize() {
+        update { s in
+            s.compactWidth = Double(Metrics.compactSize.width)
+            s.expandedWidth = Double(Metrics.expandedSize.width)
+            s.expandedHeight = Double(Metrics.expandedSize.height)
+        }
+    }
 }

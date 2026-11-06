@@ -161,6 +161,27 @@ struct GhostButton: View {
     }
 }
 
+/// 右下角的缩放手柄：两条极细的斜线，悬停时才亮起。
+/// 只负责画，真正接拖拽的是窗口层里的热区（PanelController），
+/// 这样离屏渲染出来的图里也是干净的。
+struct ResizeGrip: View {
+    let palette: Palette
+    var lit: Bool = false
+
+    var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            ForEach(0..<2, id: \.self) { i in
+                Capsule()
+                    .fill(palette.faint.opacity(lit ? 0.75 : 0.34))
+                    .frame(width: 7 - CGFloat(i) * 2.8, height: 1)
+                    .offset(x: -CGFloat(i) * 3.4, y: -CGFloat(i) * 3.4)
+            }
+        }
+        .frame(width: 12, height: 12, alignment: .bottomTrailing)
+        .allowsHitTesting(false)
+    }
+}
+
 /// 阶段小胶囊：一个呼吸的圆点 + 文案。
 struct PhaseChip: View {
     let phase: DayPhase

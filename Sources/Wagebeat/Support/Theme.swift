@@ -212,12 +212,46 @@ enum Metrics {
     /// 关掉系统窗口阴影后，边缘就不会再出现那圈灰黑色描边。
     static let windowInset: CGFloat = 20
 
-    static let compactWindow = CGSize(
-        width: compactSize.width + windowInset * 2,
-        height: compactSize.height + windowInset * 2
-    )
-    static let expandedWindow = CGSize(
-        width: expandedSize.width + windowInset * 2,
-        height: expandedSize.height + windowInset * 2
-    )
+    // MARK: - 自由缩放范围
+
+    static let minCompactWidth: CGFloat = 160
+    static let maxCompactWidth: CGFloat = 460
+    static let minExpandedWidth: CGFloat = 270
+    static let maxExpandedWidth: CGFloat = 560
+    static let minExpandedHeight: CGFloat = 340
+    static let maxExpandedHeight: CGFloat = 400
+
+    /// 收起态窄到这个宽度以下就藏起「距下班」，只留金额和状态点。
+    static let compactTimeThreshold: CGFloat = 182
+    /// 拉过这条线就换成本月累计，空间不浪费。
+    static let compactMonthThreshold: CGFloat = 300
+
+    static func clampCompactWidth(_ v: CGFloat) -> CGFloat {
+        min(max(v, minCompactWidth), maxCompactWidth)
+    }
+
+    static func clampExpandedWidth(_ v: CGFloat) -> CGFloat {
+        min(max(v, minExpandedWidth), maxExpandedWidth)
+    }
+
+    static func clampExpandedHeight(_ v: CGFloat) -> CGFloat {
+        min(max(v, minExpandedHeight), maxExpandedHeight)
+    }
+
+    static let compactWindow = compactWindow(width: compactSize.width)
+    static let expandedWindow = expandedWindow(width: expandedSize.width, height: expandedSize.height)
+
+    static func compactWindow(width: CGFloat) -> CGSize {
+        CGSize(width: width + windowInset * 2, height: compactSize.height + windowInset * 2)
+    }
+
+    static func expandedWindow(width: CGFloat, height: CGFloat) -> CGSize {
+        CGSize(width: width + windowInset * 2, height: height + windowInset * 2)
+    }
+
+    /// 圆角随尺寸轻微放大，大卡片不会显得太方。
+    static func corner(forCompactWidth w: CGFloat) -> CGFloat {
+        let t = (w - minCompactWidth) / max(1, maxCompactWidth - minCompactWidth)
+        return cornerCompact + min(max(t, 0), 1) * 7
+    }
 }

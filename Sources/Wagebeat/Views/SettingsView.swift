@@ -27,7 +27,7 @@ struct SettingsView: View {
             footer
         }
         .padding(Metrics.padding)
-        .frame(width: Metrics.expandedSize.width, height: Metrics.expandedSize.height)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Header
@@ -179,7 +179,7 @@ struct SettingsView: View {
                     .font(.system(size: 8.5, weight: .medium, design: .monospaced))
                     .foregroundStyle(p.faint)
                 Spacer(minLength: 0)
-                Text("v1.0")
+                Text("v1.1")
                     .font(.system(size: 8, weight: .medium))
                     .foregroundStyle(p.faint.opacity(0.6))
             }

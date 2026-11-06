@@ -29,9 +29,21 @@ struct ExpandedView: View {
                     .allowsHitTesting(false)
             }
         }
-        .frame(width: Metrics.expandedSize.width, height: Metrics.expandedSize.height)
+        // 尺寸由 RootView 按用户拉伸结果给定，这里只负责填满
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(CardBackground(palette: p, corner: Metrics.cornerExpanded))
         .clipShape(RoundedRectangle(cornerRadius: Metrics.cornerExpanded, style: .continuous))
+        .overlay(alignment: .bottomTrailing) {
+            ResizeGrip(palette: p)
+                .padding(6)
+        }
+    }
+
+    /// 卡片被拉大时主金额跟着长大，拉小则收敛。
+    private var heroScale: CGFloat {
+        let w = model.expandedCardSize.width
+        let t = (w - Metrics.minExpandedWidth) / max(1, Metrics.maxExpandedWidth - Metrics.minExpandedWidth)
+        return 0.86 + min(max(t, 0), 1) * 0.55
     }
 
     // MARK: - Dashboard
@@ -56,11 +68,12 @@ struct ExpandedView: View {
                 StatTile(title: clockValueTitle, value: clockValue, palette: p)
             }
 
-            Spacer().frame(height: 13)
+            // 卡片拉高时多余的空间分给两处，不要全堆在底部留一大块空白
+            Spacer(minLength: 13)
 
             monthBlock
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 12)
 
             noteRow
         }
@@ -100,7 +113,7 @@ struct ExpandedView: View {
                 .tracking(1.1)
                 .foregroundStyle(p.faint)
 
-            HeroMoney(value: snap.todayEarned, palette: p, wholeSize: 44)
+            HeroMoney(value: snap.todayEarned, palette: p, wholeSize: 44 * heroScale)
                 .padding(.top, 2)
         }
     }

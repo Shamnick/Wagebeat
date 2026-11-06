@@ -3,6 +3,14 @@ import SwiftUI
 struct RootView: View {
     @ObservedObject var model: AppModel
 
+    private var cardSize: CGSize { model.cardSize }
+    private var windowSize: CGSize {
+        CGSize(
+            width: cardSize.width + Metrics.windowInset * 2,
+            height: cardSize.height + Metrics.windowInset * 2
+        )
+    }
+
     var body: some View {
         ZStack {
             if model.isExpanded {
@@ -13,20 +21,14 @@ struct RootView: View {
                     .transition(.opacity)
             }
         }
-        .frame(
-            width: model.isExpanded ? Metrics.expandedSize.width : Metrics.compactSize.width,
-            height: model.isExpanded ? Metrics.expandedSize.height : Metrics.compactSize.height
-        )
+        .frame(width: cardSize.width, height: cardSize.height)
         // 四周留白给卡片自己画的投影，窗口本体不带系统阴影
         .padding(Metrics.windowInset)
-        .frame(
-            width: model.isExpanded ? Metrics.expandedWindow.width : Metrics.compactWindow.width,
-            height: model.isExpanded ? Metrics.expandedWindow.height : Metrics.compactWindow.height
-        )
+        .frame(width: windowSize.width, height: windowSize.height)
         .background(Color.clear)
         .preferredColorScheme(model.palette.isDark ? .dark : .light)
-        .onChange(of: model.isExpanded) { _ in
-            if !model.isExpanded { model.showSettings = false }
+        .onChange(of: model.isExpanded) { expanded in
+            if !expanded { model.showSettings = false }
         }
     }
 }

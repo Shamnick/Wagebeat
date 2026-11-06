@@ -18,6 +18,32 @@ struct WorkSettings: Codable, Equatable {
     var pinned: Bool = true
     var showInMenuBar: Bool = true
 
+    /// 卡片尺寸，可自由拉伸后记住。
+    var compactWidth: Double = 186
+    var expandedWidth: Double = 330
+    var expandedHeight: Double = 330
+
+    init() {}
+
+    /// 老版本存档里没有尺寸字段，缺哪个用默认值补哪个，不让整份设置回退。
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        dailyWage = try c.decodeIfPresent(Double.self, forKey: .dailyWage) ?? 294
+        clockIn = try c.decodeIfPresent(Int.self, forKey: .clockIn) ?? 9 * 60
+        breakStart = try c.decodeIfPresent(Int.self, forKey: .breakStart) ?? 12 * 60
+        breakEnd = try c.decodeIfPresent(Int.self, forKey: .breakEnd) ?? 14 * 60
+        clockOut = try c.decodeIfPresent(Int.self, forKey: .clockOut) ?? 19 * 60
+        hasBreak = try c.decodeIfPresent(Bool.self, forKey: .hasBreak) ?? true
+        workdays = try c.decodeIfPresent(Set<Int>.self, forKey: .workdays) ?? [2, 3, 4, 5, 6]
+        monthlyDays = try c.decodeIfPresent(Int.self, forKey: .monthlyDays)
+        theme = try c.decodeIfPresent(ThemeID.self, forKey: .theme) ?? .aurora
+        pinned = try c.decodeIfPresent(Bool.self, forKey: .pinned) ?? true
+        showInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showInMenuBar) ?? true
+        compactWidth = try c.decodeIfPresent(Double.self, forKey: .compactWidth) ?? 186
+        expandedWidth = try c.decodeIfPresent(Double.self, forKey: .expandedWidth) ?? 330
+        expandedHeight = try c.decodeIfPresent(Double.self, forKey: .expandedHeight) ?? 330
+    }
+
     var breakMinutes: Int { hasBreak ? max(0, breakEnd - breakStart) : 0 }
     var paidMinutes: Int { max(1, clockOut - clockIn - breakMinutes) }
     var paidSeconds: Double { Double(paidMinutes) * 60 }
