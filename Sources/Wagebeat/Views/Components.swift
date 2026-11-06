@@ -49,18 +49,18 @@ struct CardBackground: View {
                 shape.strokeBorder(
                     LinearGradient(
                         colors: [
-                            Color.white.opacity(palette.isDark ? 0.20 : 0.95),
-                            Color.white.opacity(palette.isDark ? 0.04 : 0.22),
-                            palette.glowB.opacity(palette.isDark ? 0.05 : 0.22)
+                            Color.white.opacity(palette.isDark ? 0.22 : 1.0),
+                            Color.white.opacity(palette.isDark ? 0.05 : 0.35),
+                            palette.glowB.opacity(palette.isDark ? 0.05 : 0.28)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     ),
-                    lineWidth: 0.9
+                    lineWidth: 1
                 )
             )
-            .shadow(color: palette.gold.opacity(palette.isDark ? 0.10 : 0.16), radius: 16, y: 8)
-            .shadow(color: .black.opacity(palette.isDark ? 0.40 : 0.10), radius: 5, y: 2)
+            .shadow(color: palette.gold.opacity(palette.isDark ? 0.10 : 0.13), radius: 18, y: 9)
+            .shadow(color: .black.opacity(palette.isDark ? 0.36 : 0.055), radius: 8, y: 3)
     }
 }
 

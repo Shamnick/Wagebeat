@@ -9,14 +9,15 @@ final class FloatingPanel: NSPanel {
 
     init() {
         super.init(
-            contentRect: NSRect(origin: .zero, size: Metrics.compactSize),
+            contentRect: NSRect(origin: .zero, size: Metrics.compactWindow),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
         isOpaque = false
         backgroundColor = .clear
-        hasShadow = true
+        // 系统窗口阴影会贴着圆角描出一条灰黑色边，改由卡片自己绘制柔和投影
+        hasShadow = false
         level = .floating
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         isMovableByWindowBackground = true
@@ -59,7 +60,7 @@ final class PanelController {
     // MARK: - Frame
 
     private func currentFrame(expanded: Bool) -> NSRect {
-        let size = Metrics.compactSize
+        let size = Metrics.compactWindow
         if let raw = UserDefaults.standard.string(forKey: positionKey) {
             let parts = raw.split(separator: ",").compactMap { Double($0) }
             if parts.count == 2 {
@@ -90,7 +91,7 @@ final class PanelController {
     private func resize(expanded: Bool) {
         guard let panel else { return }
         let old = panel.frame
-        let target = expanded ? Metrics.expandedSize : Metrics.compactSize
+        let target = expanded ? Metrics.expandedWindow : Metrics.compactWindow
 
         // 以右上角为锚点展开，避免面板“跳走”
         var rect = NSRect(

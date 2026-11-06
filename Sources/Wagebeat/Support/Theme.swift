@@ -201,9 +201,23 @@ struct Palette {
 }
 
 enum Metrics {
+    /// 卡片本身的尺寸。视图按这个尺寸布局、离屏渲染也用它。
     static let compactSize = CGSize(width: 186, height: 46)
     static let expandedSize = CGSize(width: 330, height: 330)
     static let cornerCompact: CGFloat = 15
     static let cornerExpanded: CGFloat = 26
     static let padding: CGFloat = 20
+
+    /// 窗口在卡片四周留出的透明留白，用来容纳卡片自己画的柔和投影。
+    /// 关掉系统窗口阴影后，边缘就不会再出现那圈灰黑色描边。
+    static let windowInset: CGFloat = 20
+
+    static let compactWindow = CGSize(
+        width: compactSize.width + windowInset * 2,
+        height: compactSize.height + windowInset * 2
+    )
+    static let expandedWindow = CGSize(
+        width: expandedSize.width + windowInset * 2,
+        height: expandedSize.height + windowInset * 2
+    )
 }
