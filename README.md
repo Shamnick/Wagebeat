@@ -6,15 +6,43 @@
 
 把「今天赚了多少」变成桌面上一件安静的小饰品。
 
-[![Download](https://img.shields.io/badge/⬇%20下载%20for%20macOS-Wagebeat.app.zip-6C63F0?style=for-the-badge)](https://github.com/Shamnick/Wagebeat/releases/latest)
-[![Stars](https://img.shields.io/github/stars/Shamnick/Wagebeat?style=for-the-badge&color=E8B44A&label=%E2%98%85)](https://github.com/Shamnick/Wagebeat/stargazers)
+<sub>A tiny floating wage counter for macOS — watch your salary grow, second by second.</sub>
 
+<br>
+
+[![Download](https://img.shields.io/badge/⬇%20下载%20for%20macOS-Wagebeat.app.zip-6C63F0?style=for-the-badge)](https://github.com/Shamnick/Wagebeat/releases/latest)
+[![Star](https://img.shields.io/badge/⭐%20点个%20Star-让更多人看见-E8B44A?style=for-the-badge&labelColor=1a1a1a)](https://github.com/Shamnick/Wagebeat/stargazers)
+
+[![Release](https://img.shields.io/github/v/release/Shamnick/Wagebeat?style=flat-square&color=6C63F0)](https://github.com/Shamnick/Wagebeat/releases)
+[![Stars](https://img.shields.io/github/stars/Shamnick/Wagebeat?style=flat-square&color=E8B44A)](https://github.com/Shamnick/Wagebeat/stargazers)
 ![macOS](https://img.shields.io/badge/macOS-13%2B-000?style=flat-square)
 ![Swift](https://img.shields.io/badge/Swift-5.9-F05138?style=flat-square&logo=swift&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-6C63F0?style=flat-square)
 ![No Dock Icon](https://img.shields.io/badge/Dock-隐身-B9A6F0?style=flat-square)
 
 </div>
+
+---
+
+<div align="center">
+<img src="docs/expanded-aurora.png" width="360" alt="薪跳展开态" />
+</div>
+
+<div align="center">
+<sub><b>零 Dock 图标 · 跨 Space 悬浮 · 六套浅色炫彩主题 · 可自由拉伸 · 纯 SwiftUI 原生 · 安装包 1 MB</b></sub>
+</div>
+
+---
+
+## 30 秒了解
+
+| | |
+| :--- | :--- |
+| **它是什么** | 一个常驻桌面的小浮窗，实时算出你今天赚了多少钱 |
+| **给谁用** | 拿月薪、想看见「时间正在变成钱」的人 |
+| **和番茄钟的区别** | 那些帮你熬过时间，这个帮你看见时间的价值 |
+| **占用** | 一条 186×46 的光带，不抢焦点、不进 Dock、切桌面也不消失 |
+| **隐私** | 纯本地计算，不联网、不上传、不需要登录 |
 
 ---
 
@@ -105,6 +133,15 @@
 | 午休中 | 午休是带薪的，5 小时 20 分之后自由。 |
 | 已收工 | 今天 ¥294 已落袋。剩下的时间，属于你自己。 |
 | 休息日 | 今天不上班。不被打扰的时间，也是收入的一部分。 |
+| 请假 | 今天请假。该休息的日子，就不算钱。 |
+
+### 该算的都算准了
+
+- **请假** — 一键标记今天请假，不计薪，也不摊进本月
+- **月度计薪天数** — 自动跟当月工作日走，也可手动改成 21 / 22 天（销售、外包的 21.75 常用）
+- **工作时长可调** — 上下班时间、午休区间都能改，支持连续计薪（无午休）
+- **工作日自定义** — 大小周、单休、周末上班，点一下就好
+- **本月还剩多少** — 主面板显示本月进度条与剩余工作日，知道自己离满月还差几天
 
 ### 桌面礼仪
 
@@ -113,8 +150,9 @@
 - **右上角锚点** — 展开 / 收起 / 拉伸都贴着右上角走，不会突然跳走
 - **跨 Space 悬浮** — 切桌面、进全屏应用，它都还在
 - **无 Dock 图标** — `LSUIElement`，只活在屏幕和菜单栏里
+- **开机自启动** — 勾一次，每天开机自动就位
 
-菜单栏图标里有：展开 / 收起、显示 / 隐藏、恢复默认尺寸、始终置顶、偏好设置、退出。
+菜单栏图标里有：今日已入账 / 本月累计、展开 / 收起、显示 / 隐藏、恢复默认尺寸、今天请假、始终置顶、开机自启动、菜单栏显示今日金额、偏好设置、退出。
 
 ---
 
@@ -122,7 +160,7 @@
 
 ### 下载（推荐）
 
-1. 点右上角 **[Releases](https://github.com/Shamnick/Wagebeat/releases/latest)**
+1. 点 **[Releases](https://github.com/Shamnick/Wagebeat/releases/latest)**
 2. 下载 `Wagebeat.app.zip`
 3. 解压，把 `Wagebeat.app` 拖进「应用程序」
 4. 双击打开
@@ -157,6 +195,40 @@ swift run Wagebeat --render ./shots
 
 ---
 
+## 常见问题
+
+<details>
+<summary><b>数字会传到哪里去吗？</b></summary>
+
+不会。日薪、作息、请假记录全部存在本机 `UserDefaults`，App 不发任何网络请求，也没有账号系统。
+</details>
+
+<details>
+<summary><b>为什么首次打开提示「无法验证开发者」？</b></summary>
+
+因为没买 Apple 的 99 美元开发者证书做公证。右键点 App →「打开」，或在终端执行上面的 `xattr` 命令即可，之后不会再拦。
+</details>
+
+<details>
+<summary><b>午休那两小时真的不算钱吗？</b></summary>
+
+取决于你的合同。薪跳默认按「午休不计薪」算 —— 8 小时拿 294 元。如果你的午休是带薪的，把午休开关关掉，它就会按 10 小时连续计薪，每秒金额也会相应变小。
+</details>
+
+<details>
+<summary><b>能算加班费吗？</b></summary>
+
+暂时不能，在下个版本的路线图里。目前下班后金额会停在当天满额，不会继续涨。
+</details>
+
+<details>
+<summary><b>支持多份工作 / 副业吗？</b></summary>
+
+还没做。路线图里有，欢迎在 [Issues](https://github.com/Shamnick/Wagebeat/issues) 里说说你的用法。
+</details>
+
+---
+
 ## 项目结构
 
 ```
@@ -171,7 +243,8 @@ Sources/Wagebeat/
 │   └── WorkSettings.swift     # 计薪规则 + 尺寸 + UserDefaults 持久化
 ├── Support/
 │   ├── Theme.swift            # 6 套 Palette 与尺寸常量
-│   └── Format.swift           # 金额、时长、百分比格式化
+│   ├── Format.swift           # 金额、时长、百分比格式化
+│   └── LaunchAtLogin.swift    # SMAppService 开机自启动
 └── Views/
     ├── RootView.swift         # 收起/展开切换，尺寸透传
     ├── CompactView.swift      # 长条浮窗，宽度自适应
@@ -199,7 +272,7 @@ Sources/Wagebeat/
 `NSPanel` 的默认阴影会沿着圆角描出一条灰黑色的边，很脏。现在关掉 `hasShadow`，窗口四周留 20pt 透明留白，卡片自己画投影 —— 边缘是干净的。
 
 **为什么 0.1 秒刷新？**
-1 秒太顿，0.01 秒浪费。0.1 秒足够让小数位看起来在呼吸。
+1 秒太顿，0.01 秒浪费。0.1 秒足够让小数位看起来在呼吸。日历与当月工作日列表都做了缓存，刷新本身几乎不花 CPU。
 
 ---
 
@@ -211,13 +284,27 @@ Sources/Wagebeat/
 - [x] 菜单栏入口（可显示今日金额）
 - [x] 6 套浅色炫彩主题 + 深色，即时切换
 - [x] 里程碑飘字
-- [x] **自由拉伸尺寸，松手即记**
-- [x] **今天请假 / 月度计薪天数可调**
-- [x] **开机自启动**
+- [x] 自由拉伸尺寸，松手即记
+- [x] 今天请假 / 月度计薪天数可调
+- [x] 开机自启动
 - [ ] 加班时段单独计价
 - [ ] 多份工作 / 多时段规则
 - [ ] 历史收入曲线
 - [ ] 通知中心小组件
+
+> 想要哪个先做？去 [Issues](https://github.com/Shamnick/Wagebeat/issues) 点个 👍，我按票数排。
+
+---
+
+## 参与
+
+- 发现 bug → [开个 Issue](https://github.com/Shamnick/Wagebeat/issues/new)
+- 有想法 → [Discussions](https://github.com/Shamnick/Wagebeat/discussions) 聊聊
+- 改了代码 → 直接提 PR，欢迎任何尺寸
+
+如果它让你每天早上多点开一次、下班前多看一眼 ——
+
+**那就值得一个 Star。**
 
 ---
 
@@ -229,10 +316,12 @@ Sources/Wagebeat/
 
 <br>
 
-如果它让你每天早上多点开一次、下班前多看一眼 ——
+<a href="https://github.com/Shamnick/Wagebeat/stargazers">
+<img src="https://img.shields.io/badge/⭐%20点个%20Star-让更多人看见-E8B44A?style=for-the-badge&labelColor=1a1a1a" alt="Star" />
+</a>
 
-**那就值得一个 Star。**
+<br><br>
 
-[![Star this repo](https://img.shields.io/badge/⭐%20点个%20Star-让更多人看见-E8B44A?style=for-the-badge&labelColor=1a1a1a)](https://github.com/Shamnick/Wagebeat/stargazers)
+<sub>愿你每一次看它，数字都比昨天更从容。</sub>
 
 </div>
