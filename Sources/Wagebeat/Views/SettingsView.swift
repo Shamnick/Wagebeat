@@ -19,6 +19,7 @@ struct SettingsView: View {
                 timeRow
                 breakRow
                 weekdayRow
+                quickRow
                 themeRow
             }
 
@@ -144,6 +145,54 @@ struct SettingsView: View {
         }
     }
 
+    /// 本月计薪天数（默认跟着当月工作日走）＋ 今天请假。合成一行，不额外撑高面板。
+    private var quickRow: some View {
+        row("本月") {
+            HStack(spacing: 5) {
+                Button {
+                    model.update { st in
+                        switch st.monthlyDays {
+                        case nil: st.monthlyDays = 21
+                        case 21: st.monthlyDays = 22
+                        default: st.monthlyDays = nil
+                        }
+                    }
+                } label: {
+                    Text(s.monthlyDays.map { "\($0) 天" } ?? "自动")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundStyle(p.text.opacity(0.92))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(p.tile))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .strokeBorder(p.stroke, lineWidth: 0.7)
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("每月按几天计薪，点击切换")
+
+                Spacer(minLength: 0)
+
+                Button {
+                    model.toggleLeaveToday()
+                } label: {
+                    Text(model.snap.isLeave ? "今日请假中" : "今天请假")
+                        .font(.system(size: 9.5, weight: .medium))
+                        .foregroundStyle(model.snap.isLeave ? (p.isDark ? Color(hex: 0x0A0B0F) : .white) : p.faint)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule().fill(model.snap.isLeave ? p.gold : p.tile)
+                        )
+                        .overlay(Capsule().strokeBorder(p.stroke, lineWidth: 0.7))
+                }
+                .buttonStyle(.plain)
+                .help("今天不计薪，也不计入本月")
+            }
+        }
+    }
+
     private var themeRow: some View {
         row("主题") {
             HStack(spacing: 0) {
@@ -179,7 +228,7 @@ struct SettingsView: View {
                     .font(.system(size: 8.5, weight: .medium, design: .monospaced))
                     .foregroundStyle(p.faint)
                 Spacer(minLength: 0)
-                Text("v1.1")
+                Text("v1.2")
                     .font(.system(size: 8, weight: .medium))
                     .foregroundStyle(p.faint.opacity(0.6))
             }

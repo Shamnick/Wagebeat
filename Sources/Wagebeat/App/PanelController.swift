@@ -111,8 +111,10 @@ final class PanelContentView: NSView {
     }
 }
 
-final class PanelController {
+final class PanelController: NSObject {
     static let shared = PanelController()
+
+    override init() { super.init() }
 
     private var panel: FloatingPanel?
     private var model: AppModel?
@@ -311,6 +313,9 @@ final class PanelController {
 
     // MARK: - Menu Bar
 
+    private var menuPinItem: NSMenuItem?
+    private var menuHeadlineItem: NSMenuItem?
+
     private func buildStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.button?.image = NSImage(
@@ -318,21 +323,63 @@ final class PanelController {
             accessibilityDescription: "薪跳"
         )
         item.button?.image?.isTemplate = true
+        item.button?.imagePosition = .imageLeft
 
         let menu = NSMenu()
+        menu.delegate = self
+        let headline = menu.addItem(withTitle: "", action: nil, keyEquivalent: "")
+        headline.isEnabled = false
+        menuHeadlineItem = headline
+        menu.addItem(.separator())
         menu.addItem(withTitle: "展开 / 收起", action: #selector(menuToggle), keyEquivalent: "").target = self
         menu.addItem(withTitle: "显示 / 隐藏", action: #selector(menuVisible), keyEquivalent: "").target = self
         menu.addItem(withTitle: "恢复默认尺寸", action: #selector(menuResetSize), keyEquivalent: "").target = self
         menu.addItem(.separator())
+        menu.addItem(withTitle: "今天请假", action: #selector(menuLeave), keyEquivalent: "").target = self
         let pin = menu.addItem(withTitle: "始终置顶", action: #selector(menuPin), keyEquivalent: "")
         pin.target = self
-        pin.state = .on
+        pin.state = (model?.settings.pinned ?? true) ? .on : .off
+        menuPinItem = pin
+        let login = menu.addItem(withTitle: "开机自启动", action: #selector(menuLaunch), keyEquivalent: "")
+        login.target = self
+        login.state = (model?.settings.launchAtLogin ?? false) ? .on : .off
+        let amount = menu.addItem(withTitle: "菜单栏显示今日金额", action: #selector(menuAmount), keyEquivalent: "")
+        amount.target = self
+        amount.state = (model?.settings.showAmountInMenuBar ?? false) ? .on : .off
         menu.addItem(withTitle: "偏好设置…", action: #selector(menuSettings), keyEquivalent: ",").target = self
         menu.addItem(.separator())
         menu.addItem(withTitle: "退出薪跳", action: #selector(menuQuit), keyEquivalent: "q").target = self
 
         item.menu = menu
         statusItem = item
+        applyPin()
+
+        // 菜单栏金额随快照刷新
+        model?.$menuTitle
+            .removeDuplicates()
+            .sink { [weak self] title in
+                self?.statusItem?.button?.title = title
+            }
+            .store(in: &bag)
+    }
+
+    /// 打开菜单前把各项状态对齐当前设置，避免显示和实际不一致。
+    func menuWillOpen(_ menu: NSMenu) {
+        guard let model else { return }
+        menuHeadlineItem?.title = "今日已入账 ¥" + Fmt.money(model.snap.todayEarned, decimals: 2)
+            + "　本月 ¥" + Fmt.money(model.snap.monthEarned, decimals: 0)
+        menuPinItem?.state = model.settings.pinned ? .on : .off
+        for item in menu.items where item.action == #selector(menuLaunch) {
+            item.state = model.settings.launchAtLogin ? .on : .off
+        }
+        for item in menu.items where item.action == #selector(menuAmount) {
+            item.state = model.settings.showAmountInMenuBar ? .on : .off
+        }
+        for item in menu.items where item.action == #selector(menuLeave) {
+            let onLeave = model.snap.isLeave
+            item.title = onLeave ? "取消今天请假" : "今天请假"
+            item.state = onLeave ? .on : .off
+        }
     }
 
     @objc private func menuToggle() { toggleExpanded() }
@@ -348,6 +395,24 @@ final class PanelController {
         applyPin()
     }
 
+    @objc private func menuLaunch(_ sender: NSMenuItem) {
+        let on = !(model?.settings.launchAtLogin ?? false)
+        LaunchAtLogin.set(on)
+        model?.update { $0.launchAtLogin = on }
+        sender.state = on ? .on : .off
+    }
+
+    @objc private func menuAmount(_ sender: NSMenuItem) {
+        let on = !(model?.settings.showAmountInMenuBar ?? false)
+        model?.update { $0.showAmountInMenuBar = on }
+        sender.state = on ? .on : .off
+        model?.refreshMenuTitle()
+    }
+
+    @objc private func menuLeave() {
+        model?.toggleLeaveToday()
+    }
+
     @objc private func menuSettings() {
         model?.isExpanded = true
         model?.showSettings = true
@@ -357,3 +422,5 @@ final class PanelController {
         NSApp.terminate(nil)
     }
 }
+
+extension PanelController: NSMenuDelegate {}

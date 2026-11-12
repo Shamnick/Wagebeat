@@ -14,9 +14,14 @@ struct WorkSettings: Codable, Equatable {
     var workdays: Set<Int> = [2, 3, 4, 5, 6]
     /// 每月计薪天数；为空时按当月实际工作日自动计算。
     var monthlyDays: Int? = nil
+    /// 请假的日子（"2026-11-12"），不计薪也不计入本月。
+    var leaveDays: Set<String> = []
     var theme: ThemeID = .aurora
     var pinned: Bool = true
-    var showInMenuBar: Bool = true
+    /// 菜单栏图标旁显示今日金额。
+    var showAmountInMenuBar: Bool = false
+    /// 登录时自动启动。
+    var launchAtLogin: Bool = false
 
     /// 卡片尺寸，可自由拉伸后记住。
     var compactWidth: Double = 186
@@ -36,9 +41,11 @@ struct WorkSettings: Codable, Equatable {
         hasBreak = try c.decodeIfPresent(Bool.self, forKey: .hasBreak) ?? true
         workdays = try c.decodeIfPresent(Set<Int>.self, forKey: .workdays) ?? [2, 3, 4, 5, 6]
         monthlyDays = try c.decodeIfPresent(Int.self, forKey: .monthlyDays)
+        leaveDays = try c.decodeIfPresent(Set<String>.self, forKey: .leaveDays) ?? []
         theme = try c.decodeIfPresent(ThemeID.self, forKey: .theme) ?? .aurora
         pinned = try c.decodeIfPresent(Bool.self, forKey: .pinned) ?? true
-        showInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showInMenuBar) ?? true
+        showAmountInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showAmountInMenuBar) ?? false
+        launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
         compactWidth = try c.decodeIfPresent(Double.self, forKey: .compactWidth) ?? 186
         expandedWidth = try c.decodeIfPresent(Double.self, forKey: .expandedWidth) ?? 330
         expandedHeight = try c.decodeIfPresent(Double.self, forKey: .expandedHeight) ?? 330

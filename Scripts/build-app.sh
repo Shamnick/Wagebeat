@@ -8,7 +8,7 @@ DISPLAY_NAME="薪跳"
 BUILD_DIR="$ROOT/build"
 APP="$BUILD_DIR/$APP_NAME.app"
 CONFIG="${1:-release}"
-VERSION="${VERSION:-1.1.0}"
+VERSION="${VERSION:-1.2.0}"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 
 echo "==> 编译 ($CONFIG)"

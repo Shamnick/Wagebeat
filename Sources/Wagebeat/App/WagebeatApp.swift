@@ -32,6 +32,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.model = model
         PanelController.shared.install(model: model)
         PanelController.shared.applyPin()
+        // 系统里真实的自启状态优先，别让设置和它拧着
+        let real = LaunchAtLogin.isOn
+        if model.settings.launchAtLogin != real {
+            model.update { $0.launchAtLogin = real }
+        }
         model.start()
 
         if ProcessInfo.processInfo.arguments.contains("--expanded") {

@@ -14,6 +14,9 @@ final class AppModel: ObservableObject {
 
     private var timer: Timer?
     private var lastMilestoneStep: Int = 0
+    private var lastDayKey: String = ""
+    /// 菜单栏文案跟着快照变，PanelController 订阅它。
+    @Published private(set) var menuTitle: String = ""
 
     var settings: WorkSettings { store.settings }
     var palette: Palette { Palette.of(store.settings.theme) }
@@ -21,8 +24,11 @@ final class AppModel: ObservableObject {
     init(store: SettingsStore = SettingsStore(), fixedDate: Date? = nil) {
         self.store = store
         self.fixedDate = fixedDate
-        self.snap = SalaryEngine.snapshot(store.settings, at: fixedDate ?? Date())
+        let now = fixedDate ?? Date()
+        self.snap = SalaryEngine.snapshot(store.settings, at: now)
         self.lastMilestoneStep = Int(snap.todayEarned / 10)
+        self.lastDayKey = SalaryEngine.dayKey(now)
+        self.menuTitle = store.settings.showAmountInMenuBar ? "¥" + Fmt.money(snap.todayEarned, decimals: 0) : ""
     }
 
     func start() {
@@ -36,14 +42,32 @@ final class AppModel: ObservableObject {
     }
 
     private func tick() {
-        let next = SalaryEngine.snapshot(store.settings, at: Date())
+        let now = Date()
+        let next = SalaryEngine.snapshot(store.settings, at: now)
         snap = next
+
+        // 跨过零点：里程碑从头数，否则第二天要涨到昨天的金额才会飘字。
+        let day = SalaryEngine.dayKey(now)
+        if day != lastDayKey {
+            lastDayKey = day
+            lastMilestoneStep = 0
+        }
 
         let step = Int(next.todayEarned / 10)
         if step > lastMilestoneStep, next.phase == .working {
             lastMilestoneStep = step
             flash("+ ¥\(step * 10)")
         }
+
+        refreshMenuTitle()
+    }
+
+    /// 菜单栏金额只在整数元变化时才动，避免每 0.1 秒重排状态栏。
+    func refreshMenuTitle() {
+        let title = store.settings.showAmountInMenuBar
+            ? "¥" + Fmt.money(snap.todayEarned, decimals: 0)
+            : ""
+        if title != menuTitle { menuTitle = title }
     }
 
     private func flash(_ text: String) {
@@ -61,10 +85,19 @@ final class AppModel: ObservableObject {
         mutate(&s)
         store.settings = s
         snap = SalaryEngine.snapshot(s, at: fixedDate ?? Date())
+        refreshMenuTitle()
     }
 
     func bumpWage(_ delta: Double) {
         update { $0.dailyWage = max(0, $0.dailyWage + delta) }
+    }
+
+    /// 今天请假 / 销假。
+    func toggleLeaveToday() {
+        let key = SalaryEngine.dayKey(fixedDate ?? Date())
+        update { s in
+            if s.leaveDays.contains(key) { s.leaveDays.remove(key) } else { s.leaveDays.insert(key) }
+        }
     }
 
     // MARK: - 卡片尺寸
